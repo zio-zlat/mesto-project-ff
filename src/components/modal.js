@@ -1,12 +1,12 @@
-export function openModal (item) {
-  item.classList.add('popup_is-opened');
-  item.classList.remove('popup_is-animated');
+export function openModal (popup) {
+  popup.classList.add('popup_is-opened');
+  popup.classList.remove('popup_is-animated');
   document.addEventListener('keydown', closeEsc);
 }
 
-export function closeModal (item) {
-  item.classList.remove('popup_is-opened');
-  item.classList.add('popup_is-animated');
+export function closeModal (popup) {
+  popup.classList.remove('popup_is-opened');
+  popup.classList.add('popup_is-animated');
   document.removeEventListener('keydown', closeEsc);
 }
 

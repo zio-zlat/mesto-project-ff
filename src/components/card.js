@@ -1,4 +1,5 @@
-export function createCard (item, cardTemplate, deleteCard, openImage, likeButton) {
+export function createCard (item, deleteCard, openImage, likeButton) {
+  const cardTemplate = document.querySelector('#card-template').content;
   const cardElement = cardTemplate.querySelector('.places__item').cloneNode(true);
   const deleteButton = cardElement.querySelector('.card__delete-button');
   const cardImage = cardElement.querySelector('.card__image');
@@ -21,7 +22,5 @@ export function deleteCard (evt) {
 };
 
 export function likeButton (evt) {
-  if (evt.target.classList.contains('card__like-button')) {
     evt.target.classList.toggle('card__like-button_is-active');
-  }
 };

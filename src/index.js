@@ -5,11 +5,10 @@ import { openModal, closeModal, closeOverlay } from './components/modal';
 
 
 // Добавление 6 карточек по умолчанию
-const cardTemplate = document.querySelector('#card-template').content;
 const placesList = document.querySelector('.places__list');
 
 initialCards.forEach(function (item) {
-  const card = createCard(item, cardTemplate, deleteCard, openImage, likeButton);
+  const card = createCard(item, deleteCard, openImage, likeButton);
   placesList.append(card);
 });
 
@@ -31,6 +30,11 @@ function openImage (item) {
   openModal(popupTypeImage);
 }
 
+function saveByProfile () {
+  nameInput.value = profileName.textContent;
+  jobInput.value = profileDescription.textContent;
+}
+
 buttonEdit.addEventListener('click', function () {
   openModal(popupEdit);
   saveByProfile();
@@ -41,9 +45,9 @@ buttonAdd.addEventListener('click', function () {
 });
 
 // Закрытие модальных окон на Х и оверлей
-const popup = document.querySelectorAll('.popup');
+const popups = document.querySelectorAll('.popup');
 
-popup.forEach(function (item) {
+popups.forEach(function (item) {
   const popupClose = item.querySelector('.popup__close');
   item.classList.add('popup_is-animated');
   
@@ -59,18 +63,13 @@ const nameInput = formProfile.elements.name;
 const jobInput = formProfile.elements.description;
 const formButton = formProfile.querySelector('.popup__button');
 
-function saveByProfile () {
-  nameInput.value = profileName.textContent;
-  jobInput.value = profileDescription.textContent;
-}
-
 function editProfile (evt) {
   evt.preventDefault();
 
   profileName.textContent = nameInput.value;
   profileDescription.textContent = jobInput.value;
 
-  formButton.addEventListener('click', closeModal (popupEdit));
+  closeModal (popupEdit);
 }
 
 formProfile.addEventListener('submit', editProfile);
@@ -87,10 +86,10 @@ function addCard(evt) {
     name: nameCard.value,
     link: linkCard.value
   };
-  const newCard = createCard(item, cardTemplate, deleteCard, openImage, likeButton);
+  const newCard = createCard(item, deleteCard, openImage, likeButton);
   
   placesList.prepend(newCard);
-  formButton.addEventListener('click', closeModal (popupNewCard));
+  closeModal (popupNewCard);
   evt.target.reset();
 }
 
