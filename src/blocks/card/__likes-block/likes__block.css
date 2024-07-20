@@ -1,0 +1,11 @@
+.likes__block {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  align-items: center;
+}
+
+.quantity__likes {
+  font-size: 13px;
+  line-height: 15.73px;
+} 

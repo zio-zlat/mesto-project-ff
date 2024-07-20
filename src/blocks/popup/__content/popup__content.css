@@ -9,6 +9,22 @@
   padding: 34px 36px;
 }
 
+.popup_type_new-avatar .popup__content {
+  min-height: 272px;
+}
+
+.popup_type_delete-card .popup__content {
+  min-height: 181px;
+}
+
+.popup_type_delete-card .button {
+  margin-top: 30px;
+}
+
+.popup_type_error .popup__content {
+  min-height: 130px;
+}
+
 @media screen and (max-width: 568px) {
   .popup__content {
     width: 100%;
