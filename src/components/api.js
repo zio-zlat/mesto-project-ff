@@ -7,7 +7,7 @@ const config = {
     'Content-Type': 'application/json'
   }
 }
-function response(res, error) {
+function getResponse(res, error) {
   if (res.ok) {
     return res.json();
   }
@@ -18,14 +18,14 @@ export function getInfoMe() {
   return fetch(`${config.baseUrl}/users/me`, {
     headers: config.headers
   })
-    .then(res => response(res, 'Упсс, возникла ошибка. Попробуйте позже'))
+    .then(res => getResponse(res, 'Упсс, возникла ошибка. Попробуйте позже'))
 };
 
 export function getInitialCards() {
   return fetch(`${config.baseUrl}/cards`, {
     headers: config.headers
   })
-    .then(res => response(res, 'Упсс, возникла ошибка. Попробуйте позже'))
+    .then(res => getResponse(res, 'Упсс, возникла ошибка. Попробуйте позже'))
 };
 
 export function updateProfile(data) {
@@ -34,7 +34,7 @@ export function updateProfile(data) {
     headers: config.headers,
     body: JSON.stringify(data)
   })
-    .then(res => response(res, 'Не удается сохранить, попробуйте позже'))
+    .then(res => getResponse(res, 'Не удается сохранить, попробуйте позже'))
 };
 
 export function addCardToServer(data) { 
@@ -43,7 +43,7 @@ export function addCardToServer(data) {
     headers: config.headers,
     body: JSON.stringify(data)
   })
-    .then(res => response(res, 'Не удается сохранить, попробуйте позже'))
+    .then(res => getResponse(res, 'Не удается сохранить, попробуйте позже'))
 };
 
 export function changeAvatar(data) {
@@ -52,7 +52,7 @@ export function changeAvatar(data) {
     headers: config.headers,
     body: JSON.stringify(data)
   })
-    .then(res => response(res, 'Не удается сохранить, попробуйте позже'))
+    .then(res => getResponse(res, 'Не удается сохранить, попробуйте позже'))
 };
 
 export function deleteCardToServer(cardId) {
@@ -60,7 +60,7 @@ export function deleteCardToServer(cardId) {
     method: 'DELETE',
     headers: config.headers
   })
-    .then(res => response(res, 'Не удается удалить карточку, попробуйте позже')) 
+    .then(res => getResponse(res, 'Не удается удалить карточку, попробуйте позже')) 
 };
 
 export function addLikeButtonToServer(cardId) {
@@ -68,7 +68,7 @@ export function addLikeButtonToServer(cardId) {
     method: 'PUT',
     headers: config.headers
   })
-    .then(res => response(res, 'Пока недоступно, попробуйте позже'))
+    .then(res => getResponse(res, 'Пока недоступно, попробуйте позже'))
 };
 
 export function deleteLikeButtonToServer(cardId) {
@@ -76,5 +76,5 @@ export function deleteLikeButtonToServer(cardId) {
     method: 'DELETE',
     headers: config.headers
   })
-    .then(res => response(res, 'Пока недоступно, попробуйте позже'))
+    .then(res => getResponse(res, 'Пока недоступно, попробуйте позже'))
 };

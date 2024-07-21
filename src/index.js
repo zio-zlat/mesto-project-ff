@@ -1,8 +1,8 @@
 import './pages/index.css';
-import { createCard, deleteCard, likeButton } from './components/card.js';
+import { createCard } from './components/card.js';
 import { openModal, closeModal, closeOverlay } from './components/modal.js';
 import { enableValidation, clearValidation } from './components/validation.js'; 
-import { getInfoMe, getInitialCards, updateProfile, addCardToServer, changeAvatar } from './components/api.js';
+import { getInfoMe, getInitialCards, updateProfile, addCardToServer, deleteCardToServer, addLikeButtonToServer, deleteLikeButtonToServer, changeAvatar } from './components/api.js';
 
 const placesList = document.querySelector('.places__list');
 
@@ -38,29 +38,27 @@ function saveByProfile() {
   jobInput.value = profileDescription.textContent;
 };
 
-let timerFinallyClose = setTimeout(() => { closeModal }, 1500);
-
-function performPopupActions(popup) {
-  const button = popup.querySelector('.popup__button');
-  clearTimeout(timerFinallyClose);
-  openModal(popup);
-  button.textContent = 'Сохранить'
-  button.removeAttribute('disabled', true);
-  button.removeAttribute('style', 'pointer-events: none');
+buttonEdit.addEventListener('click', () => { 
+  openModal(popupEdit);
   saveByProfile();
-  clearValidation(popup, validationConfig);
-};
+  clearValidation(popupEdit, validationConfig) 
+});
 
-buttonEdit.addEventListener('click', () => { performPopupActions(popupEdit) });
-buttonAdd.addEventListener('click', () => { performPopupActions(popupNewCard) });
-avatarProfile.addEventListener('click', () => { performPopupActions(popupAvatar) });
+buttonAdd.addEventListener('click', () => { 
+  openModal(popupNewCard);
+  clearValidation(popupNewCard, validationConfig)  
+});
+
+avatarProfile.addEventListener('click', () => { 
+  openModal(popupAvatar);
+  clearValidation(popupAvatar, validationConfig) 
+});
 
 // Закрытие модальных окон на Х и оверлей
 const popups = document.querySelectorAll('.popup');
 
-popups.forEach(function (item) {
+popups.forEach(function(item) {
   const popupClose = item.querySelector('.popup__close');
-  item.classList.add('popup_is-animated');
   popupClose.addEventListener('click', () => { closeModal(item)});
   item.addEventListener('click', closeOverlay);
 });
@@ -72,15 +70,11 @@ const formProfile = document.forms['edit-profile'];
 const nameInput = formProfile.elements.name;
 const jobInput = formProfile.elements.description;
 
-function closeFormByTimer(popup) {
-  timerFinallyClose = setTimeout(() => { closeModal(popup) }, 1500);
-};
-
-function renderLoading(isLouding, button, popup) { // Функция для показа прелоудера
+function renderLoading(isLouding, button) { // Функция для показа прелоудера
   if (isLouding) {
     button.textContent = 'Сохранение...';
   } else {
-    closeFormByTimer(popup);
+    button.textContent = 'Сохранить';
   }
 };
 
@@ -103,12 +97,17 @@ function editProfile(evt) {
       profileName.textContent = nameInput.value;
       profileDescription.textContent = jobInput.value;
       closeModal(popupEdit);
+      renderLoading(false, buttonPopup);
+      buttonPopup.removeAttribute('disabled', true);
+      buttonPopup.removeAttribute('style', 'pointer-events: none');
     })
     .catch((err) => {
       buttonPopup.textContent = err;
-    })
-    .finally(() => {
-      renderLoading(false, undefined, popupEdit);
+      setTimeout(() => renderLoading(false, buttonPopup), 1000);
+      setTimeout(() => {
+        buttonPopup.removeAttribute('disabled', true);
+        buttonPopup.removeAttribute('style', 'pointer-events: none')
+      }, 1000);
     })
 };
 
@@ -128,12 +127,17 @@ function editAvatar(evt) {
       avatarProfile.setAttribute('style', `background-image: url('${linkAvatar.value}')`)
       closeModal(popupAvatar);
       evt.target.reset();
+      renderLoading(false, buttonPopup);
+      buttonPopup.removeAttribute('disabled', true);
+      buttonPopup.removeAttribute('style', 'pointer-events: none');
     })
     .catch((err) => {
       buttonPopup.textContent = err;
-    })
-    .finally(() => {
-      renderLoading(false, undefined, popupAvatar);
+      setTimeout(() => renderLoading(false, buttonPopup), 1000);
+      setTimeout(() => {
+        buttonPopup.removeAttribute('disabled', true);
+        buttonPopup.removeAttribute('style', 'pointer-events: none')
+      }, 1000);
     })
 };
 
@@ -155,17 +159,77 @@ function addCard(evt) {
       placesList.prepend(createCard(userID, dataCard, deleteCard, openImage, likeButton, openModal, closeModal));
       closeModal(popupNewCard);
       evt.target.reset();
+      renderLoading(false, buttonPopup);
+      buttonPopup.removeAttribute('disabled', true);
+      buttonPopup.removeAttribute('style', 'pointer-events: none');
     })
     .catch((err) => {
       buttonPopup.textContent = err;
-    })
-    .finally(() => {
-      renderLoading(false, undefined, popupNewCard);
+      setTimeout(() => renderLoading(false, buttonPopup), 1000);
+      setTimeout(() => {
+        buttonPopup.removeAttribute('disabled', true);
+        buttonPopup.removeAttribute('style', 'pointer-events: none')
+      }, 1000);
     })
 };
 
 formCard.addEventListener('submit', addCard);
 
+// Удаление карточки
+const popupDeleteCard = document.querySelector('.popup_type_delete-card')
+const formDelete = document.forms['delete-card'];
+const buttonYesDelete = popupDeleteCard.querySelector('.popup__button');
+const popupError = document.querySelector('.popup_type_error');
+const textPopupError = popupError.querySelector('.popup__title');
+let idCardForDelete = null;
+let cardForDelete = null;
+
+const deleteCard = (cardID, cardElement) => { 
+  openModal(popupDeleteCard);
+  idCardForDelete = cardID;
+  cardForDelete = cardElement;
+};
+
+formDelete.addEventListener('submit', () => { 
+  deleteCardToServer(idCardForDelete) 
+    .then(() => {
+      cardForDelete.remove();
+      closeModal(popupDeleteCard);
+    })
+    .catch((err) => {
+      buttonYesDelete.textContent = err;
+      setTimeout(() => {buttonYesDelete.textContent = 'Да'}, 1000);
+    });
+  })
+
+// Лайк карточки
+function likeButton(cardID, quantityLikes, closeModal, openModal, cardLikeButton, evt) {
+  const isLiked = cardLikeButton.classList.contains('card__like-button_is-active');
+  if(!isLiked) {
+    addLikeButtonToServer(cardID)
+      .then((dataCard) => {
+        quantityLikes.textContent = dataCard.likes.length;
+        evt.target.classList.add('card__like-button_is-active');
+      })
+      .catch((err) => {
+        openModal(popupError);
+        textPopupError.textContent = err;
+        setTimeout(() => closeModal(popupError), 1500);
+      })
+  } else {
+    deleteLikeButtonToServer(cardID)
+      .then((dataCard) => {
+        quantityLikes.textContent = dataCard.likes.length;
+        evt.target.classList.remove('card__like-button_is-active');
+      })
+      .catch((err) => {
+        openModal(popupError);
+        textPopupError.textContent = err;
+        setTimeout(() => closeModal(popupError), 1500);
+      })
+  }
+};
+    
 // Валидность форм
 enableValidation(validationConfig);
 
