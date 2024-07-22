@@ -1,5 +1,5 @@
 import './pages/index.css';
-import { createCard } from './components/card.js';
+import { createCard, updateLike } from './components/card.js';
 import { openModal, closeModal, closeOverlay } from './components/modal.js';
 import { enableValidation, clearValidation } from './components/validation.js'; 
 import { getInfoMe, getInitialCards, updateProfile, addCardToServer, deleteCardToServer, addLikeButtonToServer, deleteLikeButtonToServer, changeAvatar } from './components/api.js';
@@ -156,7 +156,7 @@ function addCard(evt) {
     link: linkCard.value
   })
     .then((dataCard) => {
-      placesList.prepend(createCard(userID, dataCard, deleteCard, openImage, likeButton, openModal, closeModal));
+      placesList.prepend(createCard(userID, dataCard, deleteCard, openImage, likeButton));
       closeModal(popupNewCard);
       evt.target.reset();
       renderLoading(false, buttonPopup);
@@ -203,13 +203,12 @@ formDelete.addEventListener('submit', () => {
   })
 
 // Лайк карточки
-function likeButton(cardID, quantityLikes, closeModal, openModal, cardLikeButton, evt) {
-  const isLiked = cardLikeButton.classList.contains('card__like-button_is-active');
+function likeButton(cardID, quantityLikes, evt) {
+  const isLiked = evt.target.classList.contains('card__like-button_is-active');
   if(!isLiked) {
     addLikeButtonToServer(cardID)
       .then((dataCard) => {
-        quantityLikes.textContent = dataCard.likes.length;
-        evt.target.classList.add('card__like-button_is-active');
+        updateLike(quantityLikes, dataCard.likes.length, evt);
       })
       .catch((err) => {
         openModal(popupError);
@@ -219,8 +218,7 @@ function likeButton(cardID, quantityLikes, closeModal, openModal, cardLikeButton
   } else {
     deleteLikeButtonToServer(cardID)
       .then((dataCard) => {
-        quantityLikes.textContent = dataCard.likes.length;
-        evt.target.classList.remove('card__like-button_is-active');
+        updateLike(quantityLikes, dataCard.likes.length, evt);
       })
       .catch((err) => {
         openModal(popupError);
@@ -244,7 +242,7 @@ Promise.all([getInfoMe(), getInitialCards()])
     avatarProfile.setAttribute('style', `background-image: url('${userData.avatar}')`)
     userID = userData._id;
     cards.forEach((dataCard) => {
-      placesList.append(createCard(userID, dataCard, deleteCard, openImage, likeButton, openModal, closeModal));
+      placesList.append(createCard(userID, dataCard, deleteCard, openImage, likeButton));
     })
   })
   .catch((err) => {
